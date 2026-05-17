@@ -45,6 +45,9 @@ namespace IssueTracker.Forms
             // bind the grid
             dgvIssues.DataSource = issues;
 
+            // double-click on a row = open editor
+            dgvIssues.CellDoubleClick += (s, e) => OnEditIssue(s, e);
+
             // wire up events
             WireUpMenuEvents();
             WireUpToolStripEvents();
@@ -64,6 +67,24 @@ namespace IssueTracker.Forms
                 issues.Add(i);
 
             developers = db.GetAllDevelopers();
+
+            // seed sample data the first time the app is opened
+            if (developers.Count == 0)
+            {
+                Developer d1 = new Developer(1, "Andrei", "Popescu", "andrei@qadna.ro", Specialization.Backend);
+                Developer d2 = new Developer(2, "Maria", "Ionescu", "maria@qadna.ro", Specialization.Frontend);
+                db.InsertDeveloper(d1);
+                db.InsertDeveloper(d2);
+                developers.Add(d1);
+                developers.Add(d2);
+            }
+
+            // QA testers are in-memory only for now (no DB table yet)
+            if (qaTesters.Count == 0)
+            {
+                qaTesters.Add(new QATester(1, "Anastasia", "Munteanu", "anastasia@qadna.ro"));
+                qaTesters.Add(new QATester(2, "Vlad", "Stoica", "vlad@qadna.ro"));
+            }
         }
 
 
@@ -76,7 +97,6 @@ namespace IssueTracker.Forms
 
 
         // ===== Wire-up methods =====
-        // (these find menu items by name and attach Click handlers)
 
         private void WireUpMenuEvents()
         {
@@ -150,17 +170,49 @@ namespace IssueTracker.Forms
         }
 
 
-        // ===== Event handlers (will be filled in next step) =====
+        // ===== Event handlers =====
 
         private void OnNewIssue(object sender, EventArgs e)
         {
-            MessageBox.Show("New Issue clicked - form will open here");
+            IssueEditForm dlg = new IssueEditForm(developers, qaTesters);
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Issue newIssue = dlg.GetIssue();
+                try
+                {
+                    db.InsertIssue(newIssue);
+                    issues.Add(newIssue);
+                    UpdateStatus("Added issue #" + newIssue.IssueId);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
         }
 
         private void OnEditIssue(object sender, EventArgs e)
         {
             if (dgvIssues.CurrentRow == null) return;
-            MessageBox.Show("Edit Issue clicked");
+            Issue selected = dgvIssues.CurrentRow.DataBoundItem as Issue;
+            if (selected == null) return;
+
+            IssueEditForm dlg = new IssueEditForm(selected, developers, qaTesters);
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Issue updated = dlg.GetIssue();
+                try
+                {
+                    db.UpdateIssue(updated);
+                    int index = issues.IndexOf(selected);
+                    if (index >= 0) issues.ResetItem(index);
+                    UpdateStatus("Updated issue #" + updated.IssueId);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
         }
 
         private void OnDeleteIssue(object sender, EventArgs e)
@@ -263,7 +315,6 @@ namespace IssueTracker.Forms
 
         private void ShowReport(string content, string title)
         {
-            // simple modal showing the report text + an option to save
             Form reportForm = new Form();
             reportForm.Text = title;
             reportForm.Size = new System.Drawing.Size(600, 500);
@@ -277,10 +328,10 @@ namespace IssueTracker.Forms
             txt.ScrollBars = ScrollBars.Both;
             txt.Text = content;
 
-            Button btnSave = new Button();
-            btnSave.Text = "Save to TXT";
-            btnSave.Dock = DockStyle.Bottom;
-            btnSave.Click += (s, ev) =>
+            Button btnSaveReport = new Button();
+            btnSaveReport.Text = "Save to TXT";
+            btnSaveReport.Dock = DockStyle.Bottom;
+            btnSaveReport.Click += (s, ev) =>
             {
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Filter = "Text files (*.txt)|*.txt";
@@ -293,7 +344,7 @@ namespace IssueTracker.Forms
             };
 
             reportForm.Controls.Add(txt);
-            reportForm.Controls.Add(btnSave);
+            reportForm.Controls.Add(btnSaveReport);
             reportForm.ShowDialog();
         }
 
