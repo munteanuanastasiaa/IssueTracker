@@ -16,7 +16,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Id-ul nu poate fi negativ.");
+                    throw new ArgumentException("Id can t be negative");
                 attachmentId = value;
             }
         }
@@ -38,7 +38,7 @@ namespace IssueTracker.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Numele fisierului nu poate fi gol.");
+                    throw new ArgumentException("The file name can t be empty");
                 fileName = value;
             }
         }
@@ -49,7 +49,7 @@ namespace IssueTracker.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Calea fisierului nu poate fi goala.");
+                    throw new ArgumentException("File path can t be empty");
                 filePath = value;
             }
         }
@@ -60,7 +60,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Dimensiunea nu poate fi negativa.");
+                    throw new ArgumentException("File size can t be empty");
                 fileSize = value;
             }
         }

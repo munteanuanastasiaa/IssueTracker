@@ -17,7 +17,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Id-ul nu poate fi negativ.");
+                    throw new ArgumentException("Not able to have a negative ID.");
                 qaId = value;
             }
         }
@@ -28,7 +28,7 @@ namespace IssueTracker.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Prenumele nu poate fi gol.");
+                    throw new ArgumentException("Needs to have a first name.");
                 firstName = value;
             }
         }
@@ -39,7 +39,7 @@ namespace IssueTracker.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Numele nu poate fi gol.");
+                    throw new ArgumentException("Needs to have a last name.");
                 lastName = value;
             }
         }

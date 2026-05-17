@@ -16,7 +16,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Id-ul nu poate fi negativ.");
+                    throw new ArgumentException("No negative ID Allowed");
                 projectId = value;
             }
         }
@@ -27,7 +27,7 @@ namespace IssueTracker.Models
             set
             {
                 if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("Numele proiectului nu poate fi gol.");
+                    throw new ArgumentException(" Project name can t be empty.");
                 name = value;
             }
         }
@@ -71,7 +71,7 @@ namespace IssueTracker.Models
             get
             {
                 if (index < 0 || index >= Issues.Count)
-                    throw new IndexOutOfRangeException("Index in afara limitelor.");
+                    throw new IndexOutOfRangeException("Index out od the limits");
                 return Issues[index];
             }
         }

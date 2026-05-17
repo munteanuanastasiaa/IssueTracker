@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace IssueTracker.Models
 {
+    
+      [Serializable]
     public class Issue
     {
       

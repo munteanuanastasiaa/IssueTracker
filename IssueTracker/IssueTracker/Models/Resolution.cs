@@ -15,7 +15,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Id-ul nu poate fi negativ.");
+                    throw new ArgumentException("Id can't be negative");
                 resolutionId = value;
             }
         }
@@ -51,7 +51,7 @@ namespace IssueTracker.Models
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Orele nu pot fi negative.");
+                    throw new ArgumentException("No negative hours taken allowed.");
                 hoursTaken = value;
             }
         }
