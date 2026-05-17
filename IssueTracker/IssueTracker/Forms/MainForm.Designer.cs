@@ -31,9 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.dgvIssues = new System.Windows.Forms.DataGridView();
-            this.cmsIssueGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newIssuToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,15 +44,21 @@
             this.showChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.New = new System.Windows.Forms.ToolStripButton();
             this.Save = new System.Windows.Forms.ToolStripButton();
             this.Load = new System.Windows.Forms.ToolStripButton();
+            this.dgvIssues = new System.Windows.Forms.DataGridView();
+            this.cmsIssueGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.editIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteIssueToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeStatusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.typeHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editSelectedDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvIssues)).BeginInit();
@@ -69,48 +72,13 @@
             this.fileToolStripMenuItem,
             this.reportsToolStripMenuItem,
             this.viewToolStripMenuItem,
-            this.helpToolStripMenuItem});
+            this.helpToolStripMenuItem,
+            this.typeHereToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(800, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.New,
-            this.Save,
-            this.Load});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
-            this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // dgvIssues
-            // 
-            this.dgvIssues.AllowUserToAddRows = false;
-            this.dgvIssues.AllowUserToDeleteRows = false;
-            this.dgvIssues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvIssues.ContextMenuStrip = this.cmsIssueGrid;
-            this.dgvIssues.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvIssues.Location = new System.Drawing.Point(0, 49);
-            this.dgvIssues.MultiSelect = false;
-            this.dgvIssues.Name = "dgvIssues";
-            this.dgvIssues.ReadOnly = true;
-            this.dgvIssues.Size = new System.Drawing.Size(800, 401);
-            this.dgvIssues.TabIndex = 2;
-            // 
-            // cmsIssueGrid
-            // 
-            this.cmsIssueGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.editIssueToolStripMenuItem,
-            this.deleteIssueToolStripMenuItem,
-            this.changeStatusToolStripMenuItem,
-            this.copyIDToolStripMenuItem});
-            this.cmsIssueGrid.Name = "cmsIssueGrid";
-            this.cmsIssueGrid.Size = new System.Drawing.Size(151, 92);
             // 
             // fileToolStripMenuItem
             // 
@@ -126,25 +94,25 @@
             // newIssuToolStripMenuItem
             // 
             this.newIssuToolStripMenuItem.Name = "newIssuToolStripMenuItem";
-            this.newIssuToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newIssuToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.newIssuToolStripMenuItem.Text = "&New Issue";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.loadToolStripMenuItem.Text = "&Load";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             // 
             // reportsToolStripMenuItem
@@ -203,6 +171,18 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.New,
+            this.Save,
+            this.Load});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(800, 25);
+            this.toolStrip1.TabIndex = 1;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
             // New
             // 
             this.New.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -211,7 +191,6 @@
             this.New.Name = "New";
             this.New.Size = new System.Drawing.Size(23, 22);
             this.New.Text = "New";
-        
             // 
             // Save
             // 
@@ -230,6 +209,30 @@
             this.Load.Name = "Load";
             this.Load.Size = new System.Drawing.Size(23, 22);
             this.Load.Text = "Load";
+            // 
+            // dgvIssues
+            // 
+            this.dgvIssues.AllowUserToAddRows = false;
+            this.dgvIssues.AllowUserToDeleteRows = false;
+            this.dgvIssues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvIssues.ContextMenuStrip = this.cmsIssueGrid;
+            this.dgvIssues.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvIssues.Location = new System.Drawing.Point(0, 49);
+            this.dgvIssues.MultiSelect = false;
+            this.dgvIssues.Name = "dgvIssues";
+            this.dgvIssues.ReadOnly = true;
+            this.dgvIssues.Size = new System.Drawing.Size(800, 401);
+            this.dgvIssues.TabIndex = 2;
+            // 
+            // cmsIssueGrid
+            // 
+            this.cmsIssueGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.editIssueToolStripMenuItem,
+            this.deleteIssueToolStripMenuItem,
+            this.changeStatusToolStripMenuItem,
+            this.copyIDToolStripMenuItem});
+            this.cmsIssueGrid.Name = "cmsIssueGrid";
+            this.cmsIssueGrid.Size = new System.Drawing.Size(151, 92);
             // 
             // editIssueToolStripMenuItem
             // 
@@ -264,13 +267,33 @@
             this.statusStrip1.Size = new System.Drawing.Size(800, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
-       
             // 
             // lblStatus
             // 
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(39, 17);
             this.lblStatus.Text = "Ready";
+            // 
+            // typeHereToolStripMenuItem
+            // 
+            this.typeHereToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addDeveloperToolStripMenuItem,
+            this.editSelectedDeveloperToolStripMenuItem});
+            this.typeHereToolStripMenuItem.Name = "typeHereToolStripMenuItem";
+            this.typeHereToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.typeHereToolStripMenuItem.Text = "&Manage";
+            // 
+            // addDeveloperToolStripMenuItem
+            // 
+            this.addDeveloperToolStripMenuItem.Name = "addDeveloperToolStripMenuItem";
+            this.addDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.addDeveloperToolStripMenuItem.Text = "Add Developer";
+            // 
+            // editSelectedDeveloperToolStripMenuItem
+            // 
+            this.editSelectedDeveloperToolStripMenuItem.Name = "editSelectedDeveloperToolStripMenuItem";
+            this.editSelectedDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.editSelectedDeveloperToolStripMenuItem.Text = "Edit Selected Developer";
             // 
             // MainForm
             // 
@@ -325,5 +348,8 @@
         private System.Windows.Forms.ToolStripMenuItem copyIDToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.ToolStripMenuItem typeHereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addDeveloperToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editSelectedDeveloperToolStripMenuItem;
     }
 }

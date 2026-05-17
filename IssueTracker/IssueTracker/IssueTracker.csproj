@@ -42,6 +42,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.5.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.VisualBasic.Compatibility" />
+    <Reference Include="Microsoft.VisualBasic.Compatibility.Data" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -66,6 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\CustomExceptions.cs" />
+    <Compile Include="Forms\DeveloperEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DeveloperEditForm.Designer.cs">
+      <DependentUpon>DeveloperEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\IssueEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +104,9 @@
     <Compile Include="ViewModels\IssueViewModel.cs" />
     <Compile Include="ViewModels\ProjectViewModel.cs" />
     <Compile Include="ViewModels\QATesterViewModel.cs" />
+    <EmbeddedResource Include="Forms\DeveloperEditForm.resx">
+      <DependentUpon>DeveloperEditForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\IssueEditForm.resx">
       <DependentUpon>IssueEditForm.cs</DependentUpon>
     </EmbeddedResource>

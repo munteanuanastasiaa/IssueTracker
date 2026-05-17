@@ -101,25 +101,33 @@ namespace IssueTracker.Forms
         private void WireUpMenuEvents()
         {
             // File menu
-            FindMenuItem("File", "New Issue").Click += OnNewIssue;
-            FindMenuItem("File", "Save").Click += OnSaveToFile;
-            FindMenuItem("File", "Load").Click += OnLoadFromFile;
-            FindMenuItem("File", "Exit").Click += (s, e) => this.Close();
+            SafeWire(FindMenuItem("File", "New Issue"), OnNewIssue);
+            SafeWire(FindMenuItem("File", "Save"), OnSaveToFile);
+            SafeWire(FindMenuItem("File", "Load"), OnLoadFromFile);
+            ToolStripMenuItem exitItem = FindMenuItem("File", "Exit");
+            if (exitItem != null) exitItem.Click += (s, e) => this.Close();
 
             // Edit menu (if exists)
-            ToolStripMenuItem editIssue = FindMenuItem("Edit", "Edit Issue");
-            if (editIssue != null) editIssue.Click += OnEditIssue;
+            SafeWire(FindMenuItem("Edit", "Edit Issue"), OnEditIssue);
+            SafeWire(FindMenuItem("Edit", "Delete Issue"), OnDeleteIssue);
 
-            ToolStripMenuItem deleteIssue = FindMenuItem("Edit", "Delete Issue");
-            if (deleteIssue != null) deleteIssue.Click += OnDeleteIssue;
+            // Manage menu
+            SafeWire(FindMenuItem("Manage", "Add Developer"), OnAddDeveloper);
+            SafeWire(FindMenuItem("Manage", "Edit Selected Developer"), OnEditSelectedDeveloper);
 
             // Reports menu
-            FindMenuItem("Reports", "Issues per Developer").Click += OnReportIssuesPerDev;
-            FindMenuItem("Reports", "Severity Distribution").Click += OnReportSeverity;
-            FindMenuItem("Reports", "Status Summary").Click += OnReportStatus;
+            SafeWire(FindMenuItem("Reports", "Issues per Developer"), OnReportIssuesPerDev);
+            SafeWire(FindMenuItem("Reports", "Severity Distribution"), OnReportSeverity);
+            SafeWire(FindMenuItem("Reports", "Status Summary"), OnReportStatus);
 
             // Help menu
-            FindMenuItem("Help", "About").Click += OnAbout;
+            SafeWire(FindMenuItem("Help", "About"), OnAbout);
+        }
+
+        // helper: only wire if item was found (avoids NullReferenceException)
+        private void SafeWire(ToolStripMenuItem item, EventHandler handler)
+        {
+            if (item != null) item.Click += handler;
         }
 
         private void WireUpToolStripEvents()
@@ -149,24 +157,32 @@ namespace IssueTracker.Forms
             }
         }
 
-        // helper: find a menu item by parent name + item text
+        // helper: find a menu item by parent name + item text (forgiving: case-insensitive, trims, strips &)
         private ToolStripMenuItem FindMenuItem(string parentText, string itemText)
         {
             foreach (ToolStripItem topItem in menuStrip1.Items)
             {
                 ToolStripMenuItem topMi = topItem as ToolStripMenuItem;
                 if (topMi == null) continue;
-                if (topMi.Text.Replace("&", "") != parentText) continue;
+                if (!NormalizeText(topMi.Text).Equals(NormalizeText(parentText), StringComparison.OrdinalIgnoreCase))
+                    continue;
 
                 foreach (ToolStripItem child in topMi.DropDownItems)
                 {
                     ToolStripMenuItem childMi = child as ToolStripMenuItem;
                     if (childMi == null) continue;
-                    if (childMi.Text.Replace("&", "") == itemText)
+                    if (NormalizeText(childMi.Text).Equals(NormalizeText(itemText), StringComparison.OrdinalIgnoreCase))
                         return childMi;
                 }
             }
             return null;
+        }
+
+        // helper: normalize menu text for comparison
+        private string NormalizeText(string s)
+        {
+            if (s == null) return "";
+            return s.Replace("&", "").Trim();
         }
 
 
@@ -372,6 +388,78 @@ namespace IssueTracker.Forms
                 "PAW Project - Theme #32\n" +
                 "ASE Bucharest 2026",
                 "About");
+        }
+
+
+        // ===== Developer management =====
+
+        private void OnAddDeveloper(object sender, EventArgs e)
+        {
+            DeveloperEditForm dlg = new DeveloperEditForm();
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Developer newDev = dlg.GetDeveloper();
+                try
+                {
+                    db.InsertDeveloper(newDev);
+                    developers.Add(newDev);
+                    UpdateStatus("Added developer " + newDev.FirstName + " " + newDev.LastName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
+        }
+
+        private void OnEditSelectedDeveloper(object sender, EventArgs e)
+        {
+            if (developers.Count == 0)
+            {
+                MessageBox.Show("No developers to edit.");
+                return;
+            }
+
+            string input = Microsoft.VisualBasic.Interaction.InputBox(
+                "Enter Developer ID to edit:",
+                "Edit Developer",
+                developers[0].DeveloperId.ToString());
+
+            if (string.IsNullOrEmpty(input)) return;
+
+            int id;
+            if (!int.TryParse(input, out id))
+            {
+                MessageBox.Show("Invalid ID.");
+                return;
+            }
+
+            Developer found = null;
+            foreach (Developer d in developers)
+            {
+                if (d.DeveloperId == id) { found = d; break; }
+            }
+
+            if (found == null)
+            {
+                MessageBox.Show("Developer with ID " + id + " not found.");
+                return;
+            }
+
+            DeveloperEditForm dlg = new DeveloperEditForm(found);
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                Developer updated = dlg.GetDeveloper();
+                try
+                {
+                    db.UpdateDeveloper(updated);
+                    UpdateStatus("Updated developer #" + updated.DeveloperId);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                }
+            }
         }
     }
 }
