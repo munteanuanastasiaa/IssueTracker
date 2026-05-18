@@ -1,15 +1,15 @@
 ﻿using IssueTracker.Models;
+using IssueTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Lifetime;
 using System.Windows.Forms;
 
 namespace IssueTracker.Forms
 {
     public partial class IssueEditForm : Form
     {
-        private Issue editedIssue;
+        private IssueViewModel viewModel;
         private bool isEditMode;
 
         // ===== Constructor 1: create new issue =====
@@ -17,10 +17,11 @@ namespace IssueTracker.Forms
         {
             InitializeComponent();
             isEditMode = false;
-            editedIssue = null;
+            viewModel = new IssueViewModel();
 
             PopulateDropdowns(developers, qaTesters);
-            SetFormDefaults();
+            SetViewModelDefaults();
+            SetupBindings();
             WireUpEvents();
 
             this.Text = "New Issue";
@@ -31,13 +32,36 @@ namespace IssueTracker.Forms
         {
             InitializeComponent();
             isEditMode = true;
-            editedIssue = existing;
+            viewModel = new IssueViewModel(existing);
 
             PopulateDropdowns(developers, qaTesters);
-            LoadIssueIntoForm(existing);
+            SetupBindings();
+            PreselectReporterAndAssignee();
+            nudIssueId.Enabled = false; // can't change ID of existing issue
             WireUpEvents();
 
             this.Text = "Edit Issue #" + existing.IssueId;
+        }
+
+
+        // ===== Set up data bindings between controls and the ViewModel =====
+        // This is the rubric item #11: each control is bound to a ViewModel property.
+        // When the user types in a control, the ViewModel is updated automatically.
+        // When the ViewModel changes (via OnPropertyChanged), the control refreshes automatically.
+        private void SetupBindings()
+        {
+            // simple value bindings (TextBox.Text, NumericUpDown.Value, etc.)
+            nudIssueId.DataBindings.Add("Value", viewModel, "IssueId", true, DataSourceUpdateMode.OnPropertyChanged);
+            txtTitle.DataBindings.Add("Text", viewModel, "Title", true, DataSourceUpdateMode.OnPropertyChanged);
+            txtDescription.DataBindings.Add("Text", viewModel, "Description", true, DataSourceUpdateMode.OnPropertyChanged);
+            cmbSeverity.DataBindings.Add("SelectedItem", viewModel, "Severity", true, DataSourceUpdateMode.OnPropertyChanged);
+            cmbStatus.DataBindings.Add("SelectedItem", viewModel, "Status", true, DataSourceUpdateMode.OnPropertyChanged);
+            cmbEnvironment.DataBindings.Add("SelectedItem", viewModel, "Environment", true, DataSourceUpdateMode.OnPropertyChanged);
+            dtpDateReported.DataBindings.Add("Value", viewModel, "DateReported", true, DataSourceUpdateMode.OnPropertyChanged);
+            nudHoursSpent.DataBindings.Add("Value", viewModel, "HoursSpent", true, DataSourceUpdateMode.OnPropertyChanged);
+
+            // Note: cmbReporter, cmbAssignee, and txtLabels are handled manually in BtnSave
+            // because they need special conversion (people objects to IDs, comma-separated string to array)
         }
 
 
@@ -65,37 +89,30 @@ namespace IssueTracker.Forms
         }
 
 
-        private void SetFormDefaults()
+        private void SetViewModelDefaults()
         {
-            nudIssueId.Value = 0;
-            txtTitle.Text = "";
-            txtDescription.Text = "";
-            cmbSeverity.SelectedItem = Severity.Low;
-            cmbStatus.SelectedItem = IssueStatus.Open;
-            cmbEnvironment.SelectedItem = IssueEnvironment.Local;
-            dtpDateReported.Value = DateTime.Now;
+            viewModel.IssueId = 0;
+            viewModel.Title = "";
+            viewModel.Description = "";
+            viewModel.Severity = Severity.Low;
+            viewModel.Status = IssueStatus.Open;
+            viewModel.Environment = IssueEnvironment.Local;
+            viewModel.DateReported = DateTime.Now;
+            viewModel.HoursSpent = 0;
+            viewModel.Labels = new string[0];
+
             if (cmbReporter.Items.Count > 0) cmbReporter.SelectedIndex = 0;
             if (cmbAssignee.Items.Count > 0) cmbAssignee.SelectedIndex = 0;
-            nudHoursSpent.Value = 0;
             txtLabels.Text = "";
         }
 
 
-        private void LoadIssueIntoForm(Issue i)
+        private void PreselectReporterAndAssignee()
         {
-            nudIssueId.Value = i.IssueId;
-            nudIssueId.Enabled = false;
-            txtTitle.Text = i.Title;
-            txtDescription.Text = i.Description;
-            cmbSeverity.SelectedItem = i.Severity;
-            cmbStatus.SelectedItem = i.Status;
-            cmbEnvironment.SelectedItem = i.Environment;
-            dtpDateReported.Value = i.DateReported;
-
             foreach (var item in cmbReporter.Items)
             {
                 QATester q = item as QATester;
-                if (q != null && q.QATesterId == i.ReporterId)
+                if (q != null && q.QATesterId == viewModel.ReporterId)
                 {
                     cmbReporter.SelectedItem = q;
                     break;
@@ -105,15 +122,14 @@ namespace IssueTracker.Forms
             foreach (var item in cmbAssignee.Items)
             {
                 Developer d = item as Developer;
-                if (d != null && d.DeveloperId == i.AssigneeId)
+                if (d != null && d.DeveloperId == viewModel.AssigneeId)
                 {
                     cmbAssignee.SelectedItem = d;
                     break;
                 }
             }
 
-            nudHoursSpent.Value = (decimal)i.HoursSpent;
-            txtLabels.Text = i.Labels != null ? string.Join(",", i.Labels) : "";
+            txtLabels.Text = viewModel.Labels != null ? string.Join(",", viewModel.Labels) : "";
         }
 
 
@@ -171,32 +187,28 @@ namespace IssueTracker.Forms
 
             try
             {
-                if (editedIssue == null)
-                    editedIssue = new Issue();
+                // most fields already synced to ViewModel via bindings.
+                // we just need to handle the 3 special cases manually:
 
-                editedIssue.IssueId = (int)nudIssueId.Value;
-                editedIssue.Title = txtTitle.Text;
-                editedIssue.Description = txtDescription.Text;
-                editedIssue.Severity = (Severity)cmbSeverity.SelectedItem;
-                editedIssue.Status = (IssueStatus)cmbStatus.SelectedItem;
-                editedIssue.Environment = (IssueEnvironment)cmbEnvironment.SelectedItem;
-                editedIssue.DateReported = dtpDateReported.Value;
-                editedIssue.ReporterId = ((QATester)cmbReporter.SelectedItem).QATesterId;
-                editedIssue.AssigneeId = cmbAssignee.SelectedItem != null
+                // 1. Reporter (extract ID from selected QATester object)
+                viewModel.ReporterId = ((QATester)cmbReporter.SelectedItem).QATesterId;
+
+                // 2. Assignee (extract ID from selected Developer object)
+                viewModel.AssigneeId = cmbAssignee.SelectedItem != null
                     ? ((Developer)cmbAssignee.SelectedItem).DeveloperId
                     : 0;
-                editedIssue.HoursSpent = (double)nudHoursSpent.Value;
 
+                // 3. Labels (parse comma-separated string into array)
                 if (!string.IsNullOrWhiteSpace(txtLabels.Text))
                 {
                     string[] labels = txtLabels.Text.Split(',');
                     for (int idx = 0; idx < labels.Length; idx++)
                         labels[idx] = labels[idx].Trim();
-                    editedIssue.Labels = labels;
+                    viewModel.Labels = labels;
                 }
                 else
                 {
-                    editedIssue.Labels = new string[0];
+                    viewModel.Labels = new string[0];
                 }
 
                 this.DialogResult = DialogResult.OK;
@@ -216,9 +228,10 @@ namespace IssueTracker.Forms
         }
 
 
+        // Returns the underlying Issue model from the ViewModel
         public Issue GetIssue()
         {
-            return editedIssue;
+            return viewModel.GetIssue();
         }
     }
 }
