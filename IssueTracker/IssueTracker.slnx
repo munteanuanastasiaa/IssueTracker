@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="IssueTracker.Controls/IssueTracker.Controls.csproj" />
-  <Project Path="IssueTracker/IssueTracker.csproj" />
+  <Project Path="IssueTracker.Controls/IssueTracker.Controls.csproj" Id="1ca1d404-7766-4a24-a5f9-3473e48a3367" />
+  <Project Path="IssueTracker/IssueTracker.csproj" Id="777cf9b3-e641-4bdc-9dce-5f51305fb26f" />
 </Solution>
