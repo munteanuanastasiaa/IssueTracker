@@ -136,7 +136,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\IssueTracker.Controls\IssueTracker.Controls.csproj">
+      <Project>{1ca1d404-7766-4a24-a5f9-3473e48a3367}</Project>
+      <Name>IssueTracker.Controls</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

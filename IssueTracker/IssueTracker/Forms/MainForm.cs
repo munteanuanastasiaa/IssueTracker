@@ -1,6 +1,7 @@
 ﻿using IssueTracker.Models;
 using IssueTracker.Services;
 using IssueTracker.ViewModels;
+using IssueTracker.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,10 @@ namespace IssueTracker.Forms
 
         // file paths
         private readonly string dbPath = "issuetracker.db";
+
+        // print preview state
+        private System.Drawing.Printing.PrintDocument printDoc;
+        private int printRowIndex;
 
 
         public MainForm()
@@ -47,6 +52,10 @@ namespace IssueTracker.Forms
 
             // double-click on a row = open editor
             dgvIssues.CellDoubleClick += (s, e) => OnEditIssue(s, e);
+
+            // selection change = update issue card
+            dgvIssues.SelectionChanged += DgvIssues_SelectionChanged;
+            DgvIssues_SelectionChanged(null, EventArgs.Empty);
 
             // wire up events
             WireUpMenuEvents();
@@ -104,6 +113,7 @@ namespace IssueTracker.Forms
             SafeWire(FindMenuItem("File", "New Issue"), OnNewIssue);
             SafeWire(FindMenuItem("File", "Save"), OnSaveToFile);
             SafeWire(FindMenuItem("File", "Load"), OnLoadFromFile);
+            SafeWire(FindMenuItem("File", "Print Preview"), OnPrintPreview);
             ToolStripMenuItem exitItem = FindMenuItem("File", "Exit");
             if (exitItem != null) exitItem.Click += (s, e) => this.Close();
 
@@ -460,6 +470,175 @@ namespace IssueTracker.Forms
                     MessageBox.Show("Error: " + ex.Message);
                 }
             }
+        }
+
+
+        // ===== Print preview =====
+
+        private void OnPrintPreview(object sender, EventArgs e)
+        {
+            if (issues.Count == 0)
+            {
+                MessageBox.Show("No issues to print.");
+                return;
+            }
+
+            printDoc = new System.Drawing.Printing.PrintDocument();
+            printDoc.PrintPage += PrintDoc_PrintPage;
+            printRowIndex = 0;
+
+            PrintPreviewDialog preview = new PrintPreviewDialog();
+            preview.Document = printDoc;
+            preview.Width = 900;
+            preview.Height = 700;
+            preview.ShowDialog();
+        }
+
+        private void PrintDoc_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            System.Drawing.Graphics g = e.Graphics;
+            System.Drawing.Font titleFont = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
+            System.Drawing.Font headerFont = new System.Drawing.Font("Arial", 10, System.Drawing.FontStyle.Bold);
+            System.Drawing.Font rowFont = new System.Drawing.Font("Arial", 9);
+            System.Drawing.Brush blackBrush = System.Drawing.Brushes.Black;
+
+            float x = e.MarginBounds.Left;
+            float y = e.MarginBounds.Top;
+            float pageBottom = e.MarginBounds.Bottom;
+
+            // title (first page only)
+            if (printRowIndex == 0)
+            {
+                g.DrawString("Issue Tracker - Issue List", titleFont, blackBrush, x, y);
+                y += 35;
+                g.DrawString("Generated: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm"),
+                    rowFont, blackBrush, x, y);
+                y += 25;
+            }
+
+            // header row
+            g.DrawString("ID", headerFont, blackBrush, x, y);
+            g.DrawString("Title", headerFont, blackBrush, x + 50, y);
+            g.DrawString("Severity", headerFont, blackBrush, x + 300, y);
+            g.DrawString("Status", headerFont, blackBrush, x + 400, y);
+            g.DrawString("Hours", headerFont, blackBrush, x + 500, y);
+            y += 20;
+
+            // horizontal line under header
+            g.DrawLine(System.Drawing.Pens.Black, x, y, e.MarginBounds.Right, y);
+            y += 5;
+
+            // data rows
+            while (printRowIndex < issues.Count)
+            {
+                if (y + 20 > pageBottom)
+                {
+                    e.HasMorePages = true;
+                    return;
+                }
+
+                Issue issue = issues[printRowIndex];
+                g.DrawString(issue.IssueId.ToString(), rowFont, blackBrush, x, y);
+                g.DrawString(Truncate(issue.Title, 35), rowFont, blackBrush, x + 50, y);
+                g.DrawString(issue.Severity.ToString(), rowFont, blackBrush, x + 300, y);
+                g.DrawString(issue.Status.ToString(), rowFont, blackBrush, x + 400, y);
+                g.DrawString(issue.HoursSpent.ToString("0.0"), rowFont, blackBrush, x + 500, y);
+                y += 18;
+
+                printRowIndex++;
+            }
+
+            e.HasMorePages = false;
+        }
+
+        private string Truncate(string s, int maxLen)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            if (s.Length <= maxLen) return s;
+            return s.Substring(0, maxLen - 3) + "...";
+        }
+
+
+        // ===== Drag and drop =====
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            this.DragEnter += MainForm_DragEnter;
+            this.DragDrop += MainForm_DragDrop;
+        }
+
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files == null || files.Length == 0) return;
+
+            string file = files[0];
+
+            try
+            {
+                List<Issue> loaded;
+                if (file.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                    loaded = FileManager.LoadIssuesFromJson(file);
+                else if (file.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+                    loaded = FileManager.LoadIssuesFromCsv(file);
+                else
+                {
+                    MessageBox.Show("Only .csv and .json files are supported.");
+                    return;
+                }
+
+                issues.Clear();
+                foreach (Issue i in loaded)
+                    issues.Add(i);
+
+                UpdateStatus("Imported " + loaded.Count + " issues from dropped file");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Drop import failed: " + ex.Message);
+            }
+        }
+
+
+        // ===== Issue card update =====
+
+        private void DgvIssues_SelectionChanged(object sender, EventArgs e)
+        {
+            if (issueCard == null) return; // protect against early calls before designer init
+
+            if (dgvIssues.CurrentRow == null)
+            {
+                issueCard.ClearCard();
+                return;
+            }
+
+            Issue selected = dgvIssues.CurrentRow.DataBoundItem as Issue;
+            if (selected == null)
+            {
+                issueCard.ClearCard();
+                return;
+            }
+
+            issueCard.DisplayIssue(
+                selected.IssueId,
+                selected.Title,
+                selected.Severity.ToString(),
+                selected.Status.ToString(),
+                selected.HoursSpent);
+        }
+
+        private void issueCard_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

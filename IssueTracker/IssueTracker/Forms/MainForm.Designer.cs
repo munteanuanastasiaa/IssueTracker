@@ -44,6 +44,9 @@
             this.showChartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.typeHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editSelectedDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.New = new System.Windows.Forms.ToolStripButton();
             this.Save = new System.Windows.Forms.ToolStripButton();
@@ -56,9 +59,8 @@
             this.copyIDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.typeHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editSelectedDeveloperToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.printPreviewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.issueCard = new IssueTracker.Controls.IssueCardControl();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvIssues)).BeginInit();
@@ -86,7 +88,8 @@
             this.newIssuToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.loadToolStripMenuItem,
-            this.exitToolStripMenuItem});
+            this.exitToolStripMenuItem,
+            this.printPreviewToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
@@ -94,25 +97,25 @@
             // newIssuToolStripMenuItem
             // 
             this.newIssuToolStripMenuItem.Name = "newIssuToolStripMenuItem";
-            this.newIssuToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.newIssuToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newIssuToolStripMenuItem.Text = "&New Issue";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadToolStripMenuItem.Text = "&Load";
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             // 
             // reportsToolStripMenuItem
@@ -154,7 +157,7 @@
             // showChartToolStripMenuItem
             // 
             this.showChartToolStripMenuItem.Name = "showChartToolStripMenuItem";
-            this.showChartToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showChartToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.showChartToolStripMenuItem.Text = "Show &Chart";
             // 
             // helpToolStripMenuItem
@@ -168,11 +171,33 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "&About";
+            // 
+            // typeHereToolStripMenuItem
+            // 
+            this.typeHereToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addDeveloperToolStripMenuItem,
+            this.editSelectedDeveloperToolStripMenuItem});
+            this.typeHereToolStripMenuItem.Name = "typeHereToolStripMenuItem";
+            this.typeHereToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.typeHereToolStripMenuItem.Text = "&Manage";
+            // 
+            // addDeveloperToolStripMenuItem
+            // 
+            this.addDeveloperToolStripMenuItem.Name = "addDeveloperToolStripMenuItem";
+            this.addDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.addDeveloperToolStripMenuItem.Text = "Add Developer";
+            // 
+            // editSelectedDeveloperToolStripMenuItem
+            // 
+            this.editSelectedDeveloperToolStripMenuItem.Name = "editSelectedDeveloperToolStripMenuItem";
+            this.editSelectedDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
+            this.editSelectedDeveloperToolStripMenuItem.Text = "Edit Selected Developer";
             // 
             // toolStrip1
             // 
+            this.toolStrip1.AllowDrop = true;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.New,
             this.Save,
@@ -212,6 +237,7 @@
             // 
             // dgvIssues
             // 
+            this.dgvIssues.AllowDrop = true;
             this.dgvIssues.AllowUserToAddRows = false;
             this.dgvIssues.AllowUserToDeleteRows = false;
             this.dgvIssues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -274,32 +300,28 @@
             this.lblStatus.Size = new System.Drawing.Size(39, 17);
             this.lblStatus.Text = "Ready";
             // 
-            // typeHereToolStripMenuItem
+            // printPreviewToolStripMenuItem
             // 
-            this.typeHereToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addDeveloperToolStripMenuItem,
-            this.editSelectedDeveloperToolStripMenuItem});
-            this.typeHereToolStripMenuItem.Name = "typeHereToolStripMenuItem";
-            this.typeHereToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
-            this.typeHereToolStripMenuItem.Text = "&Manage";
+            this.printPreviewToolStripMenuItem.Name = "printPreviewToolStripMenuItem";
+            this.printPreviewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.printPreviewToolStripMenuItem.Text = "&Print Preview";
             // 
-            // addDeveloperToolStripMenuItem
+            // issueCard
             // 
-            this.addDeveloperToolStripMenuItem.Name = "addDeveloperToolStripMenuItem";
-            this.addDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.addDeveloperToolStripMenuItem.Text = "Add Developer";
-            // 
-            // editSelectedDeveloperToolStripMenuItem
-            // 
-            this.editSelectedDeveloperToolStripMenuItem.Name = "editSelectedDeveloperToolStripMenuItem";
-            this.editSelectedDeveloperToolStripMenuItem.Size = new System.Drawing.Size(197, 22);
-            this.editSelectedDeveloperToolStripMenuItem.Text = "Edit Selected Developer";
+            this.issueCard.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.issueCard.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.issueCard.Location = new System.Drawing.Point(488, 295);
+            this.issueCard.Name = "issueCard";
+            this.issueCard.Size = new System.Drawing.Size(300, 130);
+            this.issueCard.TabIndex = 5;
+            this.issueCard.Load += new System.EventHandler(this.issueCard_Load);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.issueCard);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.dgvIssues);
             this.Controls.Add(this.toolStrip1);
@@ -351,5 +373,7 @@
         private System.Windows.Forms.ToolStripMenuItem typeHereToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addDeveloperToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editSelectedDeveloperToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem printPreviewToolStripMenuItem;
+        private Controls.IssueCardControl issueCard;
     }
 }
